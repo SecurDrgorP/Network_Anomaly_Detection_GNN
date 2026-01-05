@@ -1,90 +1,290 @@
 # Structural Anomaly Detection in Network Topologies using Graph Neural Networks
 
-**Project Subject:** Detection of Structural Anomalies in a Network
-**Dataset:** Internet Topology Zoo (Abilene Network)
+---
 
-**NOTE**: you can use another dataset from: [Topology Zoo / Datasets](https://topology-zoo.org/dataset.html)
+## Plan
 
-## 1. Project Abstract
+1. [Overview](#overview)
+2. [Project Objectives](#project-objectives)
+3. [Dataset](#dataset)
+4. [Anomaly Types Modeled](#anomaly-types-modeled)
+5. [Methodology](#methodology)
+6. [Anomaly Scoring Strategy](#anomaly-scoring-strategy)
+7. [Evaluation Protocol](#evaluation-protocol)
+8. [Results Summary](#results-summary)
+9. [Project Structure](#project-structure)
+10. [Usage Instructions](#usage-instructions)
+11. [Outputs & Deliverables](#outputs--deliverables)
+12. [Applications](#applications)
+13. [Key Takeaway](#key-takeaway)
 
-This project addresses the challenge of monitoring modern network infrastructures by moving beyond simple threshold-based alerts. The objective is to detect **structural anomalies**—configurations or connections that deviate from the statistical norm of the network topology—using unsupervised Deep Learning.
+---
 
-We compare two distinct approaches:
+## Overview
 
-1. **DBSCAN (Density-Based Spatial Clustering):** A classical machine learning method analyzing tabular node attributes (CPU, Memory).
-2. **Graph Auto-Encoder (GAE):** A Graph Neural Network (GNN) architecture that learns a latent representation of the network topology to identify unlikely connections.
+Modern network infrastructures (cloud, ISP backbones, enterprise VLANs, SOC environments) face increasingly complex failure and attack patterns. Traditional monitoring systems rely heavily on **threshold-based alerts** (CPU, memory, bandwidth), which are insufficient to detect **topological misconfigurations or stealthy lateral connections**.
 
-## 2. Technical Architecture
+This project proposes a **graph-based anomaly detection framework** that detects both:
 
-### 2.1. Environment and Prerequisites
+* **Attribute anomalies** (e.g., abnormal resource usage)
+* **Structural anomalies** (e.g., unauthorized links between isolated network segments)
 
-The solution is implemented in Python using the following core libraries:
+by explicitly modeling the **network topology** using **Graph Neural Networks (GNNs)**.
 
-* **PyTorch & PyTorch Geometric:** For GNN implementation and tensor operations.
-* **NetworkX:** For graph manipulation and generation.
-* **Scikit-Learn:** For the DBSCAN implementation and performance metrics.
-* **Pandas/NumPy:** For data preprocessing and feature engineering.
+---
 
-### 2.2. Data Pipeline
+## Project Objectives
 
-Since public datasets (Topology Zoo) provide only static topology, a synthetic feature generation pipeline was developed:
+* Detect **structural anomalies** that cannot be identified using classical tabular methods
+* Compare **traditional ML (DBSCAN)** with **Graph Representation Learning**
+* Simulate a **realistic secure network scenario** (strict VLAN isolation)
+* Demonstrate why **topological context is essential** for anomaly detection in networks
 
-* **Topology Source:** Abilene Network (backbone).
-* **Feature Simulation:** CPU and Memory usage are simulated based on node degree, with Gaussian noise added to mimic real-world variance.
-* **Anomaly Injection:**
-* *Attribute Anomalies:* High resource usage injected into low-degree edge nodes.
-* *Structural Anomalies:* Non-existent links added between unrelated nodes to simulate misconfigurations.
+---
 
+## Dataset
 
+### Base Topology
 
-## 3. Methodology
+* **Source:** Internet Topology Zoo (conceptually inspired)
+* **Implementation:** Synthetic **VLAN-based network topology**
+* **Model:** Stochastic Block Model (SBM)
 
-### Phase 1: Tabular Clustering (Baseline)
+Each VLAN represents a **secure subnet**, where:
 
-We utilized **DBSCAN** to cluster nodes based on normalized CPU and Memory vectors.
+* Intra-VLAN communication is allowed
+* Inter-VLAN communication is **strictly forbidden**
 
-* *Hypothesis:* Anomalies appear as low-density points (outliers) in the feature space.
-* *Limitation:* This method treats nodes as independent data points, ignoring the adjacency matrix (network links).
+This design provides a **clean ground truth** for detecting structural violations.
 
-### Phase 2: Graph Representation Learning (Proposed Solution)
+> 💡 The framework is dataset-agnostic and can be applied to any real network topology provided as an edge list.
 
-We implemented a **Graph Auto-Encoder (GAE)** consisting of:
+---
 
-* **Encoder (GCN):** Two Graph Convolutional layers that compress the input graph () into a low-dimensional latent space .
-* **Decoder:** A dot-product decoder that attempts to reconstruct the adjacency matrix from .
-* **Anomaly Scoring:** The reconstruction loss acts as the anomaly score. Links with low predicted probabilities during decoding are flagged as structural anomalies.
+## Anomaly Types Modeled
 
-## 4. Evaluation and Metrics
+### 1. Attribute Anomalies
 
-The models were evaluated against a ground-truth label set generated during the simulation phase.
+Simulated as **extreme CPU usage spikes**:
 
-**Key Performance Indicators (KPIs):**
+* Normal nodes: CPU ∈ [0.1, 1.0]
+* Anomalous nodes: CPU ∈ [90, 100]
 
-* **ROC-AUC Score:** To measure the global ranking quality of the anomaly scores.
-* **Precision/Recall:** To assess the trade-off between false positives and missed anomalies.
+These anomalies are designed to be **easily detectable by DBSCAN**, serving as a baseline.
 
-**Results Summary:**
-The analysis demonstrates that while DBSCAN effectively identifies simple resource overloads (Attribute Anomalies), it fails to detect topological errors. The GNN approach successfully identifies structural anomalies by leveraging the graph structure, confirming the hypothesis that topological context is essential for robust network monitoring.
+---
 
-## 5. Usage Instructions
+### 2. Structural Anomalies (Core Contribution)
 
-1. **Installation:**
-Uncomment and run the installation commands in the second code cell to install the required dependencies:
-```bash
-pip install torch torch-geometric networkx pandas scikit-learn matplotlib requests
+Injected as **unauthorized links** between distant VLANs:
+
+* Example: Direct connections between VLAN 0 and VLAN 3
+* Represent:
+
+  * Firewall misconfigurations
+  * Unauthorized tunnels
+  * Lateral movement / backdoors
+
+These anomalies **do not affect node attributes**, making them invisible to classical ML.
+
+---
+
+## Methodology
+
+## Phase 1: Baseline — DBSCAN (Tabular ML)
+
+### Description
+
+* Nodes are treated as independent samples
+* Features used:
+
+  * CPU usage
+  * Memory usage
+* No graph structure is considered
+
+### Hypothesis
+
+Anomalous nodes lie in **low-density regions** of the feature space.
+
+### Limitations
+
+* Ignores adjacency and topology
+* Cannot detect structural anomalies
+* Fails when anomalies are **purely relational**
+
+---
+
+## Phase 2: Graph-Based Learning — Graph Auto-Encoder (GNN)
+
+### Model Architecture
+
+**Encoder**
+
+* GraphSAGE-based encoder
+* Learns node embeddings by aggregating neighborhood information
+* Captures:
+
+  * VLAN structure
+  * Connectivity patterns
+  * Structural regularities
+
+**Decoder**
+
+* Dot-product decoder
+* Reconstructs the adjacency matrix
+* Outputs link existence probabilities
+
+---
+
+### Learning Principle
+
+The model is trained on a **clean topology only**.
+
+At inference time:
+
+* Links that **cannot be reconstructed accurately**
+* Are assigned **high reconstruction error**
+* And flagged as **structural anomalies**
+
+---
+
+## Anomaly Scoring Strategy
+
+* **Edge-level:** Low reconstructed probability ⇒ suspicious link
+* **Node-level:** A node is anomalous if it participates in at least one suspicious link
+
+Final node anomaly score:
 
 ```
+score(node) = 1 − min(reconstructed_link_probability)
+```
 
+---
 
-2. **Execution:**
-Run the provided Jupyter Notebook `project_gnn_anomaly.ipynb`. The script performs the following automated steps:
-* Downloads/Loads the dataset.
-* Generates the synthetic feature set and injects anomalies.
-* Trains the GAE model (200 epochs).
-* Outputs the comparison metrics and the final visualization.
+## Evaluation Protocol
 
+### Ground Truth
 
-3. **Deliverables:**
-* `nodes.csv` & `edges.csv`: The processed dataset.
-* `gnn_autoencoder.pth`: The trained model weights.
-* Visualizations: Comparisons of DBSCAN clusters vs. GNN structural flags.
+* Known injected CPU anomalies
+* Known injected inter-VLAN bridges
+
+### Metrics
+
+* **Precision**
+* **Recall**
+* **F1-Score**
+* **ROC-AUC** (GNN only)
+
+---
+
+## Results Summary
+
+| Method                | Attribute Anomalies | Structural Anomalies | Topology-Aware |
+| --------------------- | ------------------- | -------------------- | -------------- |
+| DBSCAN                | ✅ Detected          | ❌ Missed             | ❌ No           |
+| GNN (GraphSAGE + GAE) | ✅ Detected          | ✅ Detected           | ✅ Yes          |
+
+### Key Findings
+
+* DBSCAN performs well **only** when anomalies affect raw features
+* GNN successfully detects **stealth structural violations**
+* Structural context is **critical** for robust network anomaly detection
+
+---
+
+## Project Structure
+
+```
+Network_Anomaly_Detection/
+│
+├── data/
+│   ├── raw/                # Clean topology
+│   └── processed/          # Nodes, edges, predictions
+│
+├── utils/
+│   ├── data_loader.py
+│   ├── feature_generator.py
+│   ├── dataset.py
+│   ├── models.py
+│   ├── baseline.py
+│   ├── train.py
+│   └── visualization.py
+│
+├── notebooks/
+│   └── NADGNN.ipynb
+│
+├── models/
+│   └── gnn_model.pth
+│
+├── output/
+│   ├── dashboard.png
+│   └── risk_map.png
+│
+├── config.py
+├── main.py
+├── run.sh
+└── requirements.txt
+```
+
+---
+
+## Usage Instructions
+
+### 1. Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Run Full Pipeline
+
+```bash
+./run.sh
+```
+
+This will:
+
+* Generate the network topology
+* Inject anomalies
+* Train the GNN
+* Evaluate DBSCAN vs GNN
+* Save results, metrics, and visualizations
+
+---
+
+## Outputs & Deliverables
+
+### Data
+
+* `nodes.csv` — node features + ground truth
+* `edges_train.csv` — clean topology
+* `edges_test.csv` — topology with anomalies
+* `results_gnn_predictions.csv` — final scores & predictions
+
+### Models
+
+* `gnn_model.pth` — trained Graph Auto-Encoder
+
+### Visualizations
+
+* **Dashboard:** Training loss, ROC, confusion matrix, metrics comparison
+* **Risk Map:** Network visualization with detected anomalous links
+
+---
+
+## Applications
+
+* SOC automation & zero-trust validation
+* Cloud network misconfiguration detection
+* ISP backbone monitoring
+* Insider threat & lateral movement detection
+* Digital twin simulation of secure networks
+
+---
+
+## Key Takeaway
+
+> **Anomalies in networks are not always about “high values” —
+> they are often about “wrong connections.”**
+
+Graph Neural Networks provide the necessary inductive bias to **understand and protect network structure**, making them indispensable for next-generation network security and monitoring systems.
