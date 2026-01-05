@@ -1,5 +1,22 @@
 # Structural Anomaly Detection in Network Topologies using Graph Neural Networks
 
+
+## Plan (Table of Contents)
+
+1. **Overview**
+2. **Project Objectives**
+3. **Dataset and Network Modeling**
+4. **Anomaly Modeling**
+5. **Methodology**
+6. **Training and Inference Pipeline**
+7. **Evaluation Protocol**
+8. **Results and Analysis**
+9. **System Architecture and Project Structure**
+10. **Usage Instructions**
+11. **Outputs and Deliverables**
+12. **Applications and Use Cases**
+13. **Key Takeaways and Conclusion**
+
 ## Overview
 
 Modern network infrastructures (cloud, ISP backbones, enterprise VLANs, SOC environments) face increasingly complex failure and attack patterns. Traditional monitoring systems rely heavily on **threshold-based alerts** (CPU, memory, bandwidth), which are insufficient to detect **topological misconfigurations or stealthy lateral connections**.
