@@ -1,21 +1,24 @@
 # Structural Anomaly Detection in Network Topologies using Graph Neural Networks
 
+---
 
-## Plan (Table of Contents)
+## Plan
 
-1. **Overview**
-2. **Project Objectives**
-3. **Dataset and Network Modeling**
-4. **Anomaly Modeling**
-5. **Methodology**
-6. **Training and Inference Pipeline**
-7. **Evaluation Protocol**
-8. **Results and Analysis**
-9. **System Architecture and Project Structure**
-10. **Usage Instructions**
-11. **Outputs and Deliverables**
-12. **Applications and Use Cases**
-13. **Key Takeaways and Conclusion**
+1. [Overview](#overview)
+2. [Project Objectives](#project-objectives)
+3. [Dataset](#dataset)
+4. [Anomaly Types Modeled](#anomaly-types-modeled)
+5. [Methodology](#methodology)
+6. [Anomaly Scoring Strategy](#anomaly-scoring-strategy)
+7. [Evaluation Protocol](#evaluation-protocol)
+8. [Results Summary](#results-summary)
+9. [Project Structure](#project-structure)
+10. [Usage Instructions](#usage-instructions)
+11. [Outputs & Deliverables](#outputs--deliverables)
+12. [Applications](#applications)
+13. [Key Takeaway](#key-takeaway)
+
+---
 
 ## Overview
 
