@@ -8,3 +8,11 @@ torch
 torch-geometric
 requests
 tabulate
+streamlit
+plotly
+dash
+dash-bootstrap-components
+kaleido
+watchdog
+streamlit-plotly-events
+streamlit-aggrid
