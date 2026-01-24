@@ -423,20 +423,20 @@ def main():
     
     with col1:
         roc_fig = plot_roc_curve(data.predictions)
-        st.plotly_chart(roc_fig, use_container_width=True)
+        st.plotly_chart(roc_fig, width='stretch')
     
     with col2:
         pr_fig = plot_precision_recall_curve(data.predictions)
-        st.plotly_chart(pr_fig, use_container_width=True)
+        st.plotly_chart(pr_fig, width='stretch')
     
     with col3:
         cm_fig = plot_confusion_matrix(data.predictions)
-        st.plotly_chart(cm_fig, use_container_width=True)
+        st.plotly_chart(cm_fig, width='stretch')
     
     # Score distribution
     st.header("📈 Anomaly Score Analysis")
     score_fig = plot_score_distribution(data.predictions)
-    st.plotly_chart(score_fig, use_container_width=True)
+    st.plotly_chart(score_fig, width='stretch')
     
     # Model comparison
     if params['compare_models']:
@@ -476,7 +476,7 @@ def main():
                 x='Metric', y='Score', color='Model', barmode='group',
                 title='Model Performance Comparison'
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
     
     # Network visualization
     if params['show_network']:

@@ -319,13 +319,13 @@ def show_overview(nodes_df, results_df):
         fig_cpu = px.histogram(nodes_df, x='cpu', color='is_anomaly', 
                               title='CPU Usage Distribution',
                               labels={'is_anomaly': 'Is Anomaly'})
-        st.plotly_chart(fig_cpu, use_container_width=True)
+        st.plotly_chart(fig_cpu, width='stretch')
     
     with col2:
         fig_mem = px.histogram(nodes_df, x='mem', color='is_anomaly',
                               title='Memory Usage Distribution',
                               labels={'is_anomaly': 'Is Anomaly'})
-        st.plotly_chart(fig_mem, use_container_width=True)
+        st.plotly_chart(fig_mem, width='stretch')
 
 def show_data_analysis(nodes_df, results_df):
     """Display data analysis section"""
@@ -339,7 +339,7 @@ def show_data_analysis(nodes_df, results_df):
                         text_auto=True,
                         aspect="auto",
                         title="Feature Correlation Matrix")
-    st.plotly_chart(fig_corr, use_container_width=True)
+    st.plotly_chart(fig_corr, width='stretch')
     
     # Scatter plots
     col1, col2 = st.columns(2)
@@ -349,18 +349,18 @@ def show_data_analysis(nodes_df, results_df):
                                  color='is_anomaly',
                                  title='CPU vs Memory Usage',
                                  labels={'is_anomaly': 'Is Anomaly'})
-        st.plotly_chart(fig_scatter1, use_container_width=True)
+        st.plotly_chart(fig_scatter1, width='stretch')
     
     with col2:
         fig_scatter2 = px.scatter(nodes_df, x='degree', y='cpu',
                                  color='is_anomaly',
                                  title='Degree vs CPU Usage',
                                  labels={'is_anomaly': 'Is Anomaly'})
-        st.plotly_chart(fig_scatter2, use_container_width=True)
+        st.plotly_chart(fig_scatter2, width='stretch')
     
     # Statistical summary
     st.subheader("Statistical Summary")
-    st.dataframe(nodes_df.describe(), use_container_width=True)
+    st.dataframe(nodes_df.describe(), width='stretch')
 
 def show_model_comparison(results_df):
     """Display model comparison section"""
@@ -408,24 +408,24 @@ def show_model_comparison(results_df):
             # Metrics comparison
             metrics_dict = {'GNN': gnn_metrics, 'Baseline': baseline_metrics}
             fig_metrics = create_metrics_comparison_chart(metrics_dict)
-            st.plotly_chart(fig_metrics, use_container_width=True)
+            st.plotly_chart(fig_metrics, width='stretch')
         
         with col2:
             # ROC comparison
             fig_roc = create_roc_curve_plot(y_true, [y_scores_gnn, baseline_scores], 
                                           ['GNN', 'Baseline'])
-            st.plotly_chart(fig_roc, use_container_width=True)
+            st.plotly_chart(fig_roc, width='stretch')
         
         # Confusion matrices
         col1, col2 = st.columns(2)
         
         with col1:
             fig_cm_gnn = create_confusion_matrix_plot(y_true, y_pred_gnn, 'GNN')
-            st.plotly_chart(fig_cm_gnn, use_container_width=True)
+            st.plotly_chart(fig_cm_gnn, width='stretch')
         
         with col2:
             fig_cm_baseline = create_confusion_matrix_plot(y_true, baseline_pred, 'Baseline')
-            st.plotly_chart(fig_cm_baseline, use_container_width=True)
+            st.plotly_chart(fig_cm_baseline, width='stretch')
         
         # Detailed classification reports
         st.subheader("Detailed Classification Reports")
@@ -451,7 +451,7 @@ def show_network_visualization(edges_df, nodes_df):
     # Network topology
     if len(edges_df) > 0:
         fig_network = create_network_visualization(edges_df, nodes_df)
-        st.plotly_chart(fig_network, use_container_width=True)
+        st.plotly_chart(fig_network, width='stretch')
         
         # Network statistics
         st.subheader("Network Statistics")
@@ -471,7 +471,7 @@ def show_network_visualization(edges_df, nodes_df):
         fig_degree = px.histogram(nodes_df, x='degree', 
                                  title='Degree Distribution',
                                  nbins=20)
-        st.plotly_chart(fig_degree, use_container_width=True)
+        st.plotly_chart(fig_degree, width='stretch')
     
     else:
         st.error("No edge data available for visualization.")
@@ -514,7 +514,7 @@ def show_performance_metrics(results_df):
             xaxis_title='Threshold',
             yaxis_title='Score'
         )
-        st.plotly_chart(fig_thresh, use_container_width=True)
+        st.plotly_chart(fig_thresh, width='stretch')
         
         # Precision-Recall curve
         from sklearn.metrics import precision_recall_curve
@@ -527,7 +527,7 @@ def show_performance_metrics(results_df):
             xaxis_title='Recall',
             yaxis_title='Precision'
         )
-        st.plotly_chart(fig_pr, use_container_width=True)
+        st.plotly_chart(fig_pr, width='stretch')
         
         # Error analysis
         st.subheader("Error Analysis")
@@ -542,7 +542,7 @@ def show_performance_metrics(results_df):
             st.write("**False Positives:**")
             if len(fp_indices) > 0:
                 fp_data = results_df.iloc[fp_indices][['id', 'cpu', 'mem', 'degree', 'gnn_anomaly_score']]
-                st.dataframe(fp_data.head(10), use_container_width=True)
+                st.dataframe(fp_data.head(10), width='stretch')
             else:
                 st.write("No false positives found.")
         
@@ -550,7 +550,7 @@ def show_performance_metrics(results_df):
             st.write("**False Negatives:**")
             if len(fn_indices) > 0:
                 fn_data = results_df.iloc[fn_indices][['id', 'cpu', 'mem', 'degree', 'gnn_anomaly_score']]
-                st.dataframe(fn_data.head(10), use_container_width=True)
+                st.dataframe(fn_data.head(10), width='stretch')
             else:
                 st.write("No false negatives found.")
 
